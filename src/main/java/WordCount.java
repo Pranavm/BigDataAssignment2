@@ -19,7 +19,7 @@ public class WordCount {
 
 		private final static IntWritable one = new IntWritable(1);
 		private Text word = new Text();
-		public final static String STOPWORD_FILENAME = "";
+		public final static String STOPWORD_FILENAME = "stopwords.txt";
 		private static final int BUFFER_SIZE = 4096;
 
 		public static Map<String, Boolean> getStopWords() {
@@ -29,16 +29,15 @@ public class WordCount {
 			InputStream in = null;
 			Map<String, Boolean> stopwords = new HashMap<String, Boolean>();
 			try {
-				in = new BufferedInputStream(new 
-						FileInputStream(new File(STOPWORD_FILENAME)));
-				while ((bytesRead = in.read(buffer)) != - 1) {
+				in = new BufferedInputStream(WordCount.class.getClassLoader().getResourceAsStream(STOPWORD_FILENAME));
+				while ((bytesRead = in.read(buffer)) != -1) {
 					sb.append(new String(buffer, 0, bytesRead));
 				}
 				String stopwordString = sb.toString();
-				
+
 				String[] stopwordArray = stopwordString.split(",");
-				for (String stopword:stopwordArray) {
-					if(stopword.length() > 4) {
+				for (String stopword : stopwordArray) {
+					if (stopword.length() > 4) {
 						stopwords.put(stopword, true);
 					}
 				}
@@ -49,17 +48,18 @@ public class WordCount {
 			}
 			return stopwords;
 		}
-		
-		private final static Map<String, Boolean> STOP_WORDS = getStopWords(); 
-		
+
+		private final static Map<String, Boolean> STOP_WORDS = getStopWords();
+
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 			StringTokenizer itr = new StringTokenizer(value.toString());
 			String nextToken = "";
 			while (itr.hasMoreTokens()) {
 				nextToken = itr.nextToken().toLowerCase();
+				nextToken = nextToken.replaceAll("[^a-zA-Z0-9]", "");
 				if (!(nextToken.length() < 5 || STOP_WORDS.containsKey(nextToken))) {
 					word.set(nextToken);
-					context.write(word, one);					
+					context.write(word, one);
 				}
 			}
 		}

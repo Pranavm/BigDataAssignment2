@@ -19,8 +19,8 @@ public class MovieRating {
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 			String[] line = value.toString().split(",");
 			try {
-				word.set(line[1]);
-				rating.set(Float.parseFloat(line[2]));
+				word.set(line[1]); // Movie ID
+				rating.set(Float.parseFloat(line[2])); // Rating
 				context.write(word, rating);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
